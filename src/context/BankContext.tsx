@@ -78,29 +78,36 @@ export function BankProvider({ children }: { children: ReactNode }) {
     setCurrentUserId(null);
   }, []);
 
-  const transfer = useCallback((input: TransferInput) => {
-    setState((prev) => bankTransfer(prev, input));
-  }, []);
+  const transfer = useCallback(
+    (input: TransferInput) => {
+      const next = bankTransfer(state, input);
+      setState(next);
+    },
+    [state],
+  );
 
   const deposit = useCallback(
     (accountId: string, amount: number, description?: string) => {
-      setState((prev) => bankDeposit(prev, accountId, amount, description));
+      const next = bankDeposit(state, accountId, amount, description);
+      setState(next);
     },
-    [],
+    [state],
   );
 
   const withdraw = useCallback(
     (accountId: string, amount: number, description?: string) => {
-      setState((prev) => bankWithdraw(prev, accountId, amount, description));
+      const next = bankWithdraw(state, accountId, amount, description);
+      setState(next);
     },
-    [],
+    [state],
   );
 
   const exchange = useCallback(
     (fromAccountId: string, toAccountId: string, amount: number) => {
-      setState((prev) => bankExchange(prev, fromAccountId, toAccountId, amount));
+      const next = bankExchange(state, fromAccountId, toAccountId, amount);
+      setState(next);
     },
-    [],
+    [state],
   );
 
   const resetDemoData = useCallback(() => {
