@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -8,18 +8,30 @@
   color-scheme: light;
 }
 
+:root.dark {
+  color-scheme: dark;
+}
+
 html,
 body,
 #root {
   height: 100%;
+  width: 100%;
 }
 
 body {
+  margin: 0;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(180deg, #f6f8ff 0%, #eef2ff 100%);
-  color: #0f172a;
+  background: #ffffff;
+  color: #000000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dark body {
+  background: #000000;
+  color: #ffffff;
 }
 
 button {
@@ -32,26 +44,41 @@ button {
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-5 py-3.5 text-base font-semibold text-white shadow-sm transition active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
-  }
-
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100;
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-black bg-white px-5 py-3.5 text-base font-semibold text-black shadow-sm transition active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 dark:border-white dark:bg-black dark:text-white;
   }
 
   .input {
-    @apply block w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200;
+    @apply block w-full rounded-2xl border-2 border-black bg-white px-4 py-3 text-base text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/40 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-neutral-500 dark:focus:ring-white/40;
   }
 
   .label {
-    @apply mb-1.5 block text-sm font-medium text-slate-700;
+    @apply mb-2 block text-sm font-semibold uppercase tracking-wide text-black/70 dark:text-white/70;
   }
 
   .card {
-    @apply rounded-2xl border border-slate-200 bg-white p-6 shadow-sm;
+    @apply rounded-3xl border-2 border-black bg-white p-6 text-black shadow-sm dark:border-white dark:bg-black dark:text-white;
+  }
+
+  .option-btn {
+    @apply flex w-full items-center justify-between gap-3 rounded-2xl border-2 border-black/20 bg-white px-4 py-3.5 text-left text-base font-medium text-black transition hover:border-black active:translate-y-px dark:border-white/20 dark:bg-black dark:text-white dark:hover:border-white;
+  }
+
+  .option-btn.selected {
+    @apply border-black bg-black text-white dark:border-white dark:bg-white dark:text-black;
+  }
+}
+
+@layer utilities {
+  .safe-pad-x {
+    padding-left: max(env(safe-area-inset-left), 1rem);
+    padding-right: max(env(safe-area-inset-right), 1rem);
+  }
+  .safe-pad-y {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
   }
 }

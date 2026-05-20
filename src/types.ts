@@ -1,42 +1,49 @@
-export type Currency = "RUB" | "USD" | "EUR";
+export type Theme = "light" | "dark";
 
-export interface User {
-  id: string;
-  email: string;
-  password: string;
-  fullName: string;
-  phone?: string;
-  createdAt: string;
+export type ExamStatus =
+  | "fresh"
+  | "registered"
+  | "in_progress"
+  | "annulled"
+  | "completed";
+
+export type QuestionKind = "choice" | "text";
+
+export interface ChoiceQuestion {
+  id: number;
+  kind: "choice";
+  prompt: string;
+  options: string[];
+  correctIndex: number;
+  points: number;
+  bonus?: boolean;
 }
 
-export interface Account {
-  id: string;
-  userId: string;
-  name: string;
-  number: string;
-  balance: number;
-  currency: Currency;
-  type: "checking" | "savings" | "card";
+export interface TextQuestion {
+  id: number;
+  kind: "text";
+  prompt: string;
+  acceptedAnswers: string[];
+  points: number;
+  bonus?: boolean;
 }
 
-export type TransactionType = "transfer" | "deposit" | "withdrawal" | "fee";
+export type Question = ChoiceQuestion | TextQuestion;
 
-export interface Transaction {
-  id: string;
-  fromAccountId?: string;
-  toAccountId?: string;
-  fromUserId?: string;
-  toUserId?: string;
-  amount: number;
-  currency: Currency;
-  type: TransactionType;
-  description: string;
-  createdAt: string;
-  status: "completed" | "pending" | "failed";
+export interface AnswerRecord {
+  questionId: number;
+  given: string;
+  correct: boolean;
 }
 
-export interface BankState {
-  users: User[];
-  accounts: Account[];
-  transactions: Transaction[];
+export interface ExamState {
+  status: ExamStatus;
+  nickname: string;
+  startedAt: number | null;
+  finishedAt: number | null;
+  durationMs: number;
+  answers: AnswerRecord[];
+  currentIndex: number;
+  score: number;
+  maxScore: number;
 }

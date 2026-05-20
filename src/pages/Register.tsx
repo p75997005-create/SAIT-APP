@@ -1,150 +1,116 @@
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useBank } from "../context/useBank";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
+import { useExam } from "../context/useExam";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register } = useBank();
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirm: "",
-  });
+  const { state, register, startExam } = useExam();
+  const [nickname, setNickname] = useState(state.nickname);
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
-  function set<K extends keyof typeof form>(key: K, value: string) {
-    setForm((f) => ({ ...f, [key]: value }));
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    const trimmed = nickname.trim();
+    if (trimmed.length < 2) {
+      setError("Никнейм должен содержать минимум 2 символа.");
+      return;
+    }
+    if (trimmed.length > 24) {
+      setError("Слишком длинный никнейм (максимум 24 символа).");
+      return;
+    }
+    setError(null);
+    register(trimmed);
+    setConfirming(true);
   }
 
-  function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    if (form.password.length < 6) {
-      setError("Пароль должен содержать минимум 6 символов");
-      return;
-    }
-    if (form.password !== form.confirm) {
-      setError("Пароли не совпадают");
-      return;
-    }
-    try {
-      register({
-        fullName: form.fullName,
-        email: form.email,
-        phone: form.phone,
-        password: form.password,
-      });
-      navigate("/app");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Ошибка регистрации");
-    }
+  function handleStart() {
+    startExam();
+    navigate("/exam");
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-10">
-      <div className="card shadow-card">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-brand-600 text-white">
-            <span className="text-lg font-bold">S</span>
-          </div>
-          <div className="text-lg font-bold text-slate-900">SaitBank</div>
-        </div>
-        <h2 className="text-2xl font-bold text-slate-900">Регистрация</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Создайте аккаунт — мы откроем основной счёт и зачислим 1 000 ₽
-          приветственным бонусом.
-        </p>
+    <main className="mx-auto flex min-h-full w-full max-w-md flex-col safe-pad-x safe-pad-y">
+      <header className="flex items-center justify-between py-4">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="text-sm font-semibold underline-offset-4 hover:underline"
+        >
+          ← Назад
+        </button>
+        <ThemeToggle />
+      </header>
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="label" htmlFor="fullName">
-              ФИО
-            </label>
-            <input
-              id="fullName"
-              className="input"
-              value={form.fullName}
-              onChange={(e) => set("fullName", e.target.value)}
-              placeholder="Иван Иванов"
-              required
-            />
-          </div>
-          <div>
-            <label className="label" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              className="input"
-              value={form.email}
-              onChange={(e) => set("email", e.target.value)}
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-          <div>
-            <label className="label" htmlFor="phone">
-              Телефон
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              className="input"
-              value={form.phone}
-              onChange={(e) => set("phone", e.target.value)}
-              placeholder="+7 (900) 000-00-00"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
+      <section className="flex flex-1 flex-col justify-center gap-6 py-6">
+        {!confirming ? (
+          <>
             <div>
-              <label className="label" htmlFor="password">
-                Пароль
-              </label>
-              <input
-                id="password"
-                type="password"
-                className="input"
-                value={form.password}
-                onChange={(e) => set("password", e.target.value)}
-                required
-                minLength={6}
-              />
+              <h1 className="text-2xl font-black sm:text-3xl">Регистрация</h1>
+              <p className="mt-2 text-sm opacity-80">
+                Введи свой никнейм. Он сохранится навсегда и будет показан в
+                результатах.
+              </p>
             </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="label" htmlFor="nickname">
+                  Никнейм
+                </label>
+                <input
+                  id="nickname"
+                  className="input"
+                  value={nickname}
+                  onChange={(event) => setNickname(event.target.value)}
+                  placeholder="Например, kurik"
+                  autoFocus
+                  autoComplete="off"
+                  maxLength={32}
+                />
+                {error && (
+                  <p className="mt-2 text-sm font-semibold text-black dark:text-white">
+                    {error}
+                  </p>
+                )}
+              </div>
+              <button type="submit" className="btn-primary">
+                Сохранить никнейм
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
             <div>
-              <label className="label" htmlFor="confirm">
-                Повторите пароль
-              </label>
-              <input
-                id="confirm"
-                type="password"
-                className="input"
-                value={form.confirm}
-                onChange={(e) => set("confirm", e.target.value)}
-                required
-                minLength={6}
-              />
+              <h1 className="text-2xl font-black sm:text-3xl">
+                Готов начать, {state.nickname}?
+              </h1>
+              <p className="mt-2 text-sm opacity-80">
+                После нажатия «Начать экзамен» запустится таймер на 25 минут.
+                Свернуть вкладку или выйти из приложения нельзя — экзамен будет
+                аннулирован.
+              </p>
             </div>
-          </div>
-          {error && (
-            <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleStart}
+                className="btn-primary"
+              >
+                Начать экзамен
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirming(false)}
+                className="btn-secondary"
+              >
+                Изменить никнейм
+              </button>
             </div>
-          )}
-          <button type="submit" className="btn-primary w-full">
-            Создать аккаунт
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-slate-500">
-          Уже есть аккаунт?{" "}
-          <Link to="/login" className="font-semibold text-brand-600 hover:underline">
-            Войти
-          </Link>
-        </p>
-      </div>
-    </div>
+          </>
+        )}
+      </section>
+    </main>
   );
 }

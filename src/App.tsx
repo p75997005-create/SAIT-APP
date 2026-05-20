@@ -1,37 +1,53 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { BankProvider } from "./context/BankContext";
-import Layout from "./components/Layout";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./pages/Login";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ExamProvider } from "./context/ExamContext";
+import { useExam } from "./context/useExam";
+import Welcome from "./pages/Welcome";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import TransferPage from "./pages/Transfer";
-import Cards from "./pages/Cards";
-import History from "./pages/History";
-import Exchange from "./pages/Exchange";
-import Profile from "./pages/Profile";
+import Exam from "./pages/Exam";
+import Results from "./pages/Results";
+import Review from "./pages/Review";
+import Annulled from "./pages/Annulled";
+
+function Routed() {
+  const { state, hydrated } = useExam();
+
+  if (!hydrated) {
+    return (
+      <div className="flex min-h-full items-center justify-center">
+        <p className="text-sm uppercase tracking-widest opacity-70">
+          Загрузка…
+        </p>
+      </div>
+    );
+  }
+
+  // Annulled is sticky: no matter where the user goes, they only see this.
+  if (state.status === "annulled") {
+    return (
+      <Routes>
+        <Route path="*" element={<Annulled />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<Welcome />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/exam" element={<Exam />} />
+      <Route path="/results" element={<Results />} />
+      <Route path="/review" element={<Review />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
 export default function App() {
   return (
-    <BankProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/app" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="transfer" element={<TransferPage />} />
-              <Route path="cards" element={<Cards />} />
-              <Route path="history" element={<History />} />
-              <Route path="exchange" element={<Exchange />} />
-              <Route path="profile" element={<Profile />} />
-            </Route>
-          </Route>
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </BankProvider>
+    <ExamProvider>
+      <HashRouter>
+        <Routed />
+      </HashRouter>
+    </ExamProvider>
   );
 }
