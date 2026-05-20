@@ -63,9 +63,7 @@ export default function Welcome() {
         </div>
       </section>
 
-      <footer className="pb-4 text-center text-xs opacity-60">
-        Чёрно-белый дизайн · оптимизировано под телефоны
-      </footer>
+      <div className="pb-4" aria-hidden="true" />
     </main>
   );
 }
